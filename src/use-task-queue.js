@@ -3,12 +3,12 @@ import React from "react";
 /**
  * react hook that queues asynchronous tasks and runs them concurrently
  * @param {Object} [params]
- * @param {number} [params.threads=5] maximum number of concurrent tasks
+ * @param {number} [params.concurrent=5] maximum number of concurrent tasks
  * @returns {TaskQueue}
  */
-export function useTaskQueue({ threads = 5 } = {}) {
+export function useTaskQueue({ concurrent = Infinity } = {}) {
   /** @type {useState<Task[]>} */
-  const [activeThreads, setActiveThreads] = React.useState([]);
+  const [activeTasks, setActiveTasks] = React.useState([]);
   /** @type {useState<Task[]>} */
   const [queue, setQueue] = React.useState([]);
   /** @type {useState<TaskState[]>} */
@@ -21,7 +21,7 @@ export function useTaskQueue({ threads = 5 } = {}) {
   }
 
   React.useEffect(() => {
-    if (activeThreads.length >= threads) return;
+    if (activeTasks.length >= concurrent) return;
 
     const task = queue.shift();
     if (!task) return;
@@ -39,11 +39,11 @@ export function useTaskQueue({ threads = 5 } = {}) {
       })
       .finally(() => {
         updateTaskState(task.id, { running: false, complete: true });
-        setActiveThreads((prev) => prev.filter((t) => t.id !== task.id));
+        setActiveTasks((prev) => prev.filter((t) => t.id !== task.id));
       });
 
-    setActiveThreads((prev) => [...prev, task]);
-  }, [queue, activeThreads, threads]);
+    setActiveTasks((prev) => [...prev, task]);
+  }, [queue, activeTasks, concurrent]);
 
   return {
     tasks,
