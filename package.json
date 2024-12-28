@@ -1,7 +1,6 @@
 {
   "name": "use-task-queue",
-  "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "main": "./src/use-task-queue.js",
   "types": "./types/use-task-queue.d.ts",
