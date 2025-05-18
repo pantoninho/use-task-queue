@@ -4,6 +4,7 @@ import React from "react";
  * react hook that queues asynchronous tasks and runs them concurrently
  * @param {Object} [params]
  * @param {number} [params.concurrent=5] maximum number of concurrent tasks
+ * @param {number} [params.retries=0] number of retries for failed tasks
  * @returns {TaskQueue}
  */
 export function useTaskQueue({ concurrent = Infinity } = {}) {
@@ -16,7 +17,7 @@ export function useTaskQueue({ concurrent = Infinity } = {}) {
 
   function updateTaskState(id, state) {
     setTasks((tasks) =>
-      tasks.map((t) => (t.id === id ? { ...t, ...state } : t)),
+      tasks.map((t) => (t.id === id ? { ...t, ...state } : t))
     );
   }
 
@@ -31,14 +32,17 @@ export function useTaskQueue({ concurrent = Infinity } = {}) {
       .run()
       .then((data) => {
         task.onComplete(data);
-        updateTaskState(task.id, { data });
+        updateTaskState(task.id, { data, running: false, complete: true });
       })
       .catch((error) => {
-        task.onError(error);
-        updateTaskState(task.id, { error });
+        if (task.retries <= 0) {
+          task.onError(error);
+          updateTaskState(task.id, { error });
+          return;
+        }
+        setQueue((prev) => [...prev, { ...task, retries: task.retries - 1 }]);
       })
       .finally(() => {
-        updateTaskState(task.id, { running: false, complete: true });
         setActiveTasks((prev) => prev.filter((t) => t.id !== task.id));
       });
 
@@ -47,18 +51,14 @@ export function useTaskQueue({ concurrent = Infinity } = {}) {
 
   return {
     tasks,
-    /**
-     * adds a task to the queue
-     * @param {Function} fn function to be executed
-     * @returns {Promise<unknown>} promise that resolves to the result of the task. rejects if the task throws an error
-     */
-    add: async (fn) => {
+    add: async (fn, { retries = 0 } = {}) => {
       return new Promise((resolve, reject) => {
         const task = {
           id: crypto.randomUUID(),
           run: fn,
           onComplete: resolve,
           onError: reject,
+          retries,
         };
 
         const taskState = {
@@ -66,6 +66,7 @@ export function useTaskQueue({ concurrent = Infinity } = {}) {
           running: false,
           data: null,
           error: null,
+          complete: false,
         };
 
         setTasks((prev) => [...prev, taskState]);
@@ -87,6 +88,7 @@ export function useTaskQueue({ concurrent = Infinity } = {}) {
  * @property {() => Promise<unknown>} run
  * @property {Function} onComplete
  * @property {Function} onError
+ * @property {number?} retries
  */
 
 /**
@@ -96,6 +98,7 @@ export function useTaskQueue({ concurrent = Infinity } = {}) {
  * @property {boolean} complete
  * @property {unknown} data
  * @property {unknown} error
+ * @property {number} retries
  */
 
 /**
