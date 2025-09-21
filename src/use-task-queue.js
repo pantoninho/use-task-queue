@@ -15,39 +15,16 @@ export function useTaskQueue({ concurrent = Infinity } = {}) {
   /** @type {useState<TaskState[]>} */
   const [tasks, setTasks] = React.useState([]);
 
-  function updateTaskState(id, state) {
-    setTasks((tasks) =>
-      tasks.map((t) => (t.id === id ? { ...t, ...state } : t))
-    );
-  }
-
   React.useEffect(() => {
-    if (activeTasks.length >= concurrent) return;
-
-    const task = queue.shift();
-    if (!task) return;
-
-    updateTaskState(task.id, { running: true });
-    task
-      .run()
-      .then((data) => {
-        task.onComplete(data);
-        updateTaskState(task.id, { data, running: false, complete: true });
-      })
-      .catch((error) => {
-        if (task.retries <= 0) {
-          task.onError(error);
-          updateTaskState(task.id, { error });
-          return;
-        }
-        setQueue((prev) => [...prev, { ...task, retries: task.retries - 1 }]);
-      })
-      .finally(() => {
-        setActiveTasks((prev) => prev.filter((t) => t.id !== task.id));
-      });
-
-    setActiveTasks((prev) => [...prev, task]);
-  }, [queue, activeTasks, concurrent]);
+    triggerNextTask({
+      activeTasks,
+      queue,
+      concurrent,
+      setQueue,
+      setTasks,
+      setActiveTasks,
+    });
+  }, [queue, activeTasks, concurrent, setActiveTasks, setTasks]);
 
   return {
     tasks,
@@ -105,3 +82,53 @@ export function useTaskQueue({ concurrent = Infinity } = {}) {
  * @template T
  * @typedef {ReturnType<typeof import("react").useState<T>>} useState
  */
+
+/**
+ * @param {object} params 
+ * @param {TaskState[]} params.activeTasks
+ * @param {Task[]} params.queue
+ * @param {number} params.concurrent
+ * @param {Function} params.setQueue
+ * @param {Function} params.setTasks
+ * @param {Function} params.setActiveTasks
+ * @returns {void}
+ */
+function triggerNextTask({
+  activeTasks,
+  queue,
+  concurrent,
+  setQueue,
+  setTasks,
+  setActiveTasks,
+}) {
+  if (activeTasks.length >= concurrent) return;
+
+  function updateTaskState(id, state) {
+    setTasks((tasks) =>
+      tasks.map((t) => (t.id === id ? { ...t, ...state } : t))
+    );
+  }
+
+  const task = queue.shift();
+  if (!task) return;
+
+  updateTaskState(task.id, { running: true });
+  task
+    .run()
+    .then((data) => {
+      task.onComplete(data);
+      updateTaskState(task.id, { data, running: false, complete: true });
+    })
+    .catch((error) => {
+      if (task.retries <= 0) {
+        task.onError(error);
+        updateTaskState(task.id, { error, running: false });
+        return;
+      }
+      setQueue((prev) => [...prev, { ...task, retries: task.retries - 1 }]);
+    })
+    .finally(() => {
+      setActiveTasks((prev) => prev.filter((t) => t.id !== task.id));
+    });
+  setActiveTasks((prev) => [...prev, task]);
+}
