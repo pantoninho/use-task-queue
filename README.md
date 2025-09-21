@@ -1,6 +1,5 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/97163d2f5e7f4356a1170c7621765669)](https://app.codacy.com/gh/pantoninho/use-task-queue/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Codacy Coverage](https://app.codacy.com/project/badge/Coverage/97163d2f5e7f4356a1170c7621765669)](https://app.codacy.com/gh/pantoninho/use-task-queue/dashboard?utm_source=github.com&utm_medium=referral&utm_content=pantoninho/use-task-queue&utm_campaign=Badge_Coverage)
-[![CI](https://github.com/pantoninho/use-task-queue/actions/workflows/codacy.yml/badge.svg)](https://github.com/pantoninho/use-task-queue/actions/workflows/codacy.yml)
 
 ## use-task-queue
 
