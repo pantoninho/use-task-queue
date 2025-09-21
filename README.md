@@ -2,7 +2,6 @@
 [![Codacy Coverage](https://app.codacy.com/project/badge/Coverage/97163d2f5e7f4356a1170c7621765669)](https://app.codacy.com/gh/pantoninho/use-task-queue/dashboard?utm_source=github.com&utm_medium=referral&utm_content=pantoninho/use-task-queue&utm_campaign=Badge_Coverage)
 [![CI](https://github.com/pantoninho/use-task-queue/actions/workflows/codacy.yml/badge.svg)](https://github.com/pantoninho/use-task-queue/actions/workflows/codacy.yml)
 
-
 ## use-task-queue
 
 React hook for queueing asynchronous tasks with configurable concurrency and per-task retries.
@@ -62,6 +61,7 @@ export function Example() {
 ```
 
 Notes:
+
 - **concurrency**: `useTaskQueue({ concurrent })` limits how many tasks run at once (default: Infinity).
 - **retries**: `add(fn, { retries })` re-queues a failing task up to the specified number of retries (default: 0).
 - `add(fn)` returns a Promise that resolves/rejects with the task result/error.
