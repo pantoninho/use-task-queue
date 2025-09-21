@@ -126,9 +126,6 @@ describe.sequential("useTaskQueue", () => {
   });
 });
 
-
-
-
 function createDeferred() {
     /** @type {(value: unknown) => void} */
     let resolve;

@@ -1,3 +1,8 @@
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/97163d2f5e7f4356a1170c7621765669)](https://app.codacy.com/gh/pantoninho/use-task-queue/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Coverage](https://app.codacy.com/project/badge/Coverage/97163d2f5e7f4356a1170c7621765669)](https://app.codacy.com/gh/pantoninho/use-task-queue/dashboard?utm_source=github.com&utm_medium=referral&utm_content=pantoninho/use-task-queue&utm_campaign=Badge_Coverage)
+[![CI](https://github.com/pantoninho/use-task-queue/actions/workflows/codacy.yml/badge.svg)](https://github.com/pantoninho/use-task-queue/actions/workflows/codacy.yml)
+
+
 ## use-task-queue
 
 React hook for queueing asynchronous tasks with configurable concurrency and per-task retries.
@@ -25,9 +30,9 @@ import { useTaskQueue } from "use-task-queue";
 export function Example() {
   const { tasks, add } = useTaskQueue({ concurrent: 3 });
 
-  const enqueueWork = React.useCallback(() => {
-    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+  const handleClick = () => {
     for (let i = 0; i < 10; i++) {
       add(async () => {
         await sleep(300 + Math.random() * 700);
@@ -37,11 +42,11 @@ export function Example() {
         .then((data) => console.log("task complete", data))
         .catch((err) => console.error("task failed", err));
     }
-  }, [add]);
+  };
 
   return (
     <div>
-      <button onClick={enqueueWork}>Enqueue 10 tasks</button>
+      <button onClick={handleClick}>Enqueue 10 tasks</button>
       <ul>
         {tasks.map((t) => (
           <li key={t.id}>
