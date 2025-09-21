@@ -1,5 +1,7 @@
 ## use-task-queue
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/955f6703a28f418bb434f7bf147da1b9)](https://app.codacy.com/gh/pantoninho/use-task-queue?utm_source=github.com&utm_medium=referral&utm_content=pantoninho/use-task-queue&utm_campaign=Badge_Grade)
+
 React hook for queueing asynchronous tasks with configurable concurrency and per-task retries.
 
 ### Installation
