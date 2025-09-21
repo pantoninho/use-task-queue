@@ -5,6 +5,7 @@
   "main": "./src/use-task-queue.js",
   "types": "./types/use-task-queue.d.ts",
   "scripts": {
+    "lint": "eslint .",
     "test": "vitest run",
     "coverage": "vitest run --coverage"
   },
